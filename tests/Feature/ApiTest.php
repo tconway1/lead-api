@@ -5,9 +5,10 @@ namespace Tests\Feature;
 use App\Models\Address;
 use App\Models\Lead;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use JustSteveKing\StatusCode\Http;
 use Tests\TestCase;
 
-class ApiCrudTest extends TestCase
+class ApiTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -33,5 +34,24 @@ class ApiCrudTest extends TestCase
             'state' => $lead->address->state,
             'zip_code' => $lead->address->zip_code,
         ]);
+    }
+
+    public function test_can_retrieve_multiple_leads_via_api()
+    {
+        $leads = Lead::factory()
+            ->count(3)
+            ->has(Address::factory())
+            ->afterCreating(function (Lead $lead) {
+                $lead->load('address');
+            })
+            ->create();
+
+        $this->assertDatabaseCount(Lead::class, 3);
+        $this->assertDatabaseCount(Address::class, 3);
+
+        $response = $this->getJson('/api/leads');
+        $response->assertStatus(Http::OK->value)
+            ->assertJsonCount(3);
+            //->assertJsonCount(3, 'leads.address');
     }
 }
