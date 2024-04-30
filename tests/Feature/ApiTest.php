@@ -51,7 +51,18 @@ class ApiTest extends TestCase
 
         $response = $this->getJson('/api/leads');
         $response->assertStatus(Http::OK->value)
-            ->assertJsonCount(3);
-            //->assertJsonCount(3, 'leads.address');
+            ->assertJsonCount(3)
+            ->assertJsonStructure([
+                '*' => [
+                    'attributes' => [
+                        'address' => [
+                            'street',
+                            'city',
+                            'state',
+                            'zip_code',
+                        ],
+                    ],
+                ],
+            ]);
     }
 }

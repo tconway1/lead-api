@@ -3,21 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LeadResource;
-use App\Repositories\LeadRepository;
+use App\Services\ApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use JustSteveKing\StatusCode\Http;
 
 class ApiController extends Controller
 {
-    public function __construct(LeadRepository $leadRepository)
+    protected $apiService;
+
+    public function __construct(ApiService $apiService)
     {
-        $this->leadRepository = $leadRepository;
+        $this->apiService = $apiService;
     }
 
     public function index(): JsonResponse
     {
-        $leads = $this->leadRepository->all();
+        $leads = $this->apiService->all();
 
         return response()->json(
             data: LeadResource::collection($leads),
