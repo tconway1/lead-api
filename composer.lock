@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0266a7d4fa9a885a918383322a741d9c",
+    "content-hash": "ef4f318aa4c4c06e1bcd3722f9219ece",
     "packages": [
         {
             "name": "brick/math",
@@ -5530,6 +5530,67 @@
             "time": "2023-12-08T13:03:43+00:00"
         },
         {
+            "name": "timacdonald/json-api",
+            "version": "v1.0.0-beta.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/timacdonald/json-api.git",
+                "reference": "aed50a8698bd3efe698771abbbf7331e5f1e8aad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/timacdonald/json-api/zipball/aed50a8698bd3efe698771abbbf7331e5f1e8aad",
+                "reference": "aed50a8698bd3efe698771abbbf7331e5f1e8aad",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/collections": "^9.0 || ^10.0 || ^11.0",
+                "illuminate/database": "^9.0 || ^10.0 || ^11.0",
+                "illuminate/http": "^9.0 || ^10.0 || ^11.0",
+                "illuminate/support": "^9.0 || ^10.0 || ^11.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
+                "symfony/http-kernel": "^6.0 || ^7.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.13",
+                "laravel/framework": "^9.0 || ^10.0 || ^11.0",
+                "opis/json-schema": "^2.3",
+                "orchestra/testbench": "^7.0 || ^8.0 || ^9.0",
+                "phpunit/phpunit": "^9.0 || ^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "TiMacDonald\\JsonApi\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tim MacDonald",
+                    "email": "hello@timacdonald.me",
+                    "homepage": "https://timacdonald.me"
+                }
+            ],
+            "description": "A Lightweight JSON:API Resource for Laravel",
+            "keywords": [
+                "JSON-API",
+                "api",
+                "json",
+                "laravel",
+                "resource"
+            ],
+            "support": {
+                "docs": "https://github.com/timacdonald/json-api/blob/master/readme.md",
+                "issues": "https://github.com/timacdonald/json-api/issues",
+                "source": "https://github.com/timacdonald/json-api/releases/latest"
+            },
+            "time": "2024-03-13T01:31:10+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.0",
             "source": {
@@ -8187,7 +8248,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "timacdonald/json-api": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
