@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 
 class ApiService
 {
-    protected $leadRepository;
+    protected RepositoryInterface $leadRepository;
 
-    const VALIDATION_RULES = [
+    const CREATE_RULES = [
         'firstname' => 'required|string|max:255',
         'lastname' => 'required|string|max:255',
         'email' => 'required|string|email|max:255',
@@ -20,6 +20,10 @@ class ApiService
         'city' => 'required|string|max:255',
         'state' => 'required|string|min:2|max:2',
         'zip_code' => 'required|integer|min_digits:5|max_digits:5'
+    ];
+
+    const UPDATE_RULES = [
+        'phone' => 'required|integer|min_digits:10|max_digits:10',
     ];
 
     const ADDRESS_FIELDS = [
@@ -41,12 +45,25 @@ class ApiService
 
     public function create(Request $request): Model
     {
-        $request->validate(self::VALIDATION_RULES);
+        $request->validate(self::CREATE_RULES);
 
         return $this->leadRepository->create([
             'leadData' => $this->_cleanInput($request->except(self::ADDRESS_FIELDS)),
             'addressData' => $this->_cleanInput($request->only(self::ADDRESS_FIELDS)),
         ]);
+    }
+
+    public function update(Request $request, int $id): Model
+    {
+        $lead = $this->leadRepository->find($id);
+
+        if (empty($lead)) {
+            abort(404, 'The associated resource could not be found.');
+        }
+
+        $request->validate(self::UPDATE_RULES);
+
+        return $this->leadRepository->update($request->only('phone'), $lead);
     }
 
     private function _cleanInput(array $input): array

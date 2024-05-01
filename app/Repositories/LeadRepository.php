@@ -23,9 +23,11 @@ class LeadRepository implements RepositoryInterface
         return $lead->load('address');
     }
 
-    public function update(array $data, int $id): Model
+    public function update(array $data, Model $lead): Model
     {
-        // TODO: Implement update() method.
+        $lead->update($data);
+
+        return $lead;
     }
 
     public function delete(int $id): void
@@ -33,8 +35,8 @@ class LeadRepository implements RepositoryInterface
         // TODO: Implement delete() method.
     }
 
-    public function find(int $id): Model
+    public function find(int $id): ?Model
     {
-        // TODO: Implement find() method.
+        return Lead::find($id);
     }
 }

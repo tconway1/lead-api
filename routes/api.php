@@ -18,3 +18,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/leads', [ApiController::class, 'index']);
 
 Route::post('/leads', [ApiController::class, 'create']);
+
+Route::patch('/leads/{id}', [ApiController::class, 'update']);

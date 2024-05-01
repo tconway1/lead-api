@@ -13,9 +13,9 @@ interface RepositoryInterface
 
     public function create(array $data): Model;
 
-    public function update(array $data, int $id): Model;
+    public function update(array $data, Model $model): Model;
 
     public function delete(int $id): void;
 
-    public function find (int $id): Model;
+    public function find (int $id): ?Model;
 }

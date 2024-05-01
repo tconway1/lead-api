@@ -115,7 +115,7 @@ class ApiTest extends TestCase
             ]);
     }
 
-    public function test_create_user_validation_fails()
+    public function test_create_lead_validation_fails_via_api()
     {
         $response = $this->postJson(action([ApiController::class, 'create']), [
            // empty input
@@ -123,6 +123,82 @@ class ApiTest extends TestCase
 
         $this->assertDatabaseEmpty(Lead::class)
             ->assertDatabaseEmpty(Address::class);
+
+        $response->assertJsonStructure([
+            'errors' => [
+                'code',
+                'title',
+                'detail',
+            ],
+        ]);
+    }
+
+    public function test_can_update_lead_via_api()
+    {
+        $lead = Lead::factory()
+            ->has(Address::factory())
+            ->afterCreating(function (Lead $lead) {
+                $lead->load('address');
+            })
+            ->create();
+
+        $response = $this->patchJson(action([ApiController::class, 'update'], ['id' => $lead->id]), [
+           'phone' => 1231231234,
+        ]);
+
+        $this->assertDatabaseHas(Lead::class, [
+            'id' => $lead->id,
+            'phone' => 1231231234,
+        ]);
+
+        $response->assertJsonCount(1)
+            ->assertJsonStructure([
+                '*' => [
+                    'attributes' => [
+                        'address' => [
+                            'street',
+                            'city',
+                            'state',
+                            'zip_code',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonFragment([
+                'id' => (string) $lead->id,
+                'phone' => 1231231234
+            ]);
+    }
+
+    public function test_update_lead_not_found_via_api()
+    {
+        $response = $this->patchJson(action([ApiController::class, 'update'], ['id' => rand(10, 100)]), [
+            'phone' => 1231231234,
+        ]);
+
+        $this->assertDatabaseEmpty(Lead::class)
+            ->assertDatabaseEmpty(Address::class);
+
+        $response->assertJsonStructure([
+            'errors' => [
+                'code',
+                'title',
+                'detail',
+            ],
+        ]);
+    }
+
+    public function test_update_lead_validation_fails_via_api()
+    {
+        $lead = Lead::factory()->create();
+
+        $response = $this->patchJson(action([ApiController::class, 'update'], ['id' => $lead->id]), [
+            'phone' => 123,
+        ]);
+
+        $this->assertDatabaseHas(Lead::class, [
+            'phone' => null,
+        ]);
 
         $response->assertJsonStructure([
             'errors' => [

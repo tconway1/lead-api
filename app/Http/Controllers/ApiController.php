@@ -3,49 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LeadResource;
+use App\Http\Responses\CollectionResponse;
+use App\Http\Responses\ErrorResponse;
 use App\Services\ApiService;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use JustSteveKing\StatusCode\Http;
 
 class ApiController extends Controller
 {
-    protected $apiService;
+    protected ApiService $apiService;
 
     public function __construct(ApiService $apiService)
     {
         $this->apiService = $apiService;
     }
 
-    public function index(): JsonResponse
+    public function index(): Responsable
     {
         $leads = $this->apiService->all();
 
-        return response()->json(
-            data: LeadResource::collection($leads),
-            status: Http::OK->value
-        );
+        return new CollectionResponse(LeadResource::collection($leads));
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(Request $request): Responsable
     {
         try {
             $newLead = $this->apiService->create($request);
         } catch (\Throwable $e) {
-            return response()->json([
-                'errors' => [
-                    'code' => $e->status,
-                    'title' => Str::headline(class_basename($e)),
-                    'detail' => $e instanceof ValidationException ? $e->errors() : $e->getMessage(),
-                ],
-            ], $e->status);
+            return new ErrorResponse($e);
         }
 
-        return response()->json(
-            data: LeadResource::collection([$newLead]),
-            status: Http::OK->value
-        );
+        return new CollectionResponse(LeadResource::collection([$newLead]));
+    }
+
+    public function update(Request $request, int $id): Responsable
+    {
+        try {
+            $lead = $this->apiService->update($request, $id);
+        } catch (\Throwable $e) {
+            return new ErrorResponse($e);
+        }
+
+        return new CollectionResponse(LeadResource::collection([$lead]));
     }
 }
