@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('city', 255);
             $table->string('state', 2);
             $table->string('zip_code', 5);
-            $table->unsignedBigInteger('lead_id');
+            $table->foreignId('lead_id')
+                ->constrained()
+                ->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

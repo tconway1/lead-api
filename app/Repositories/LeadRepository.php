@@ -16,7 +16,11 @@ class LeadRepository implements RepositoryInterface
 
     public function create(array $data): Model
     {
-        // TODO: Implement create() method.
+        $lead = Lead::create($data['leadData']);
+
+        $address = $lead->address()->create($data['addressData']);
+
+        return $lead->load('address');
     }
 
     public function update(array $data, int $id): Model
