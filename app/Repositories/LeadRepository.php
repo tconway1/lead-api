@@ -14,6 +14,11 @@ class LeadRepository implements RepositoryInterface
         return Lead::all();
     }
 
+    public function allWhere(array $data): Collection
+    {
+        return Lead::where($data['field'], $data['operator'], $data['threshold'])->get();
+    }
+
     public function create(array $data): Model
     {
         $lead = Lead::create($data['leadData']);

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Http\Controllers\ApiController;
 use App\Models\Address;
 use App\Models\Lead;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use JustSteveKing\StatusCode\Http;
 use Tests\TestCase;
@@ -35,7 +36,7 @@ class ApiTest extends TestCase
         ]);
     }
 
-    public function test_can_retrieve_multiple_leads_via_api()
+    public function test_can_retrieve_multiple_leads_without_quality_via_api()
     {
         $leads = Lead::factory()
             ->count(3)
@@ -62,6 +63,90 @@ class ApiTest extends TestCase
                         ],
                     ],
                 ],
+            ]);
+    }
+
+    public function test_can_retrieve_multiple_leads_with_premium_quality_via_api()
+    {
+        $leads = Lead::factory()
+            ->count(4)
+            ->state(new Sequence(
+                ['electric_bill' => 100],
+                ['electric_bill' => 500],
+            ))
+            ->has(Address::factory())
+            ->afterCreating(function (Lead $lead) {
+                $lead->load('address');
+            })
+            ->create();
+
+        $this->assertDatabaseCount(Lead::class, 4)
+            ->assertDatabaseCount(Address::class, 4);
+
+        $response = $this->json('GET', action([ApiController::class, 'index']), [
+            'quality' => 'premium',
+        ]);
+        $response->assertStatus(Http::OK->value)
+            ->assertJsonCount(2)
+            ->assertJsonStructure([
+                '*' => [
+                    'attributes' => [
+                        'address' => [
+                            'street',
+                            'city',
+                            'state',
+                            'zip_code',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonFragment([
+                'electric_bill' => 500,
+            ])
+            ->assertJsonMissing([
+                'electric_bill' => 100,
+            ]);
+    }
+
+    public function test_can_retrieve_multiple_leads_with_standard_quality_via_api()
+    {
+        $leads = Lead::factory()
+            ->count(4)
+            ->state(new Sequence(
+                ['electric_bill' => 100],
+                ['electric_bill' => 500],
+            ))
+            ->has(Address::factory())
+            ->afterCreating(function (Lead $lead) {
+                $lead->load('address');
+            })
+            ->create();
+
+        $this->assertDatabaseCount(Lead::class, 4)
+            ->assertDatabaseCount(Address::class, 4);
+
+        $response = $this->json('GET', action([ApiController::class, 'index']), [
+            'quality' => 'standard',
+        ]);
+        $response->assertStatus(Http::OK->value)
+            ->assertJsonCount(2)
+            ->assertJsonStructure([
+                '*' => [
+                    'attributes' => [
+                        'address' => [
+                            'street',
+                            'city',
+                            'state',
+                            'zip_code',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonFragment([
+                'electric_bill' => 100,
+            ])
+            ->assertJsonMissing([
+                'electric_bill' => 500,
             ]);
     }
 

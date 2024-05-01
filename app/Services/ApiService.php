@@ -26,12 +26,18 @@ class ApiService
         'phone' => 'required|integer|min_digits:10|max_digits:10',
     ];
 
+    const QUALITY_RULES = [
+        'quality' => 'sometimes|required|string|in:standard,premium'
+    ];
+
     const ADDRESS_FIELDS = [
         'street',
         'city',
         'state',
         'zip_code',
     ];
+
+    const PREMIUM = 'premium';
 
     const LEAD_NOT_FOUND = 'The associated resource could not be found.';
 
@@ -40,9 +46,23 @@ class ApiService
         $this->leadRepository = $leadRepository;
     }
 
-    public function all(): Collection
+    public function all(Request $request): Collection
     {
-        return $this->leadRepository->all()->load('address');
+        $request->validate(self::QUALITY_RULES);
+
+        // if no quality, return all
+        if (empty($request->quality)) {
+            return $this->leadRepository->all()->load('address');
+        }
+
+        // set operator to be used in query based on quality parameter
+        $operator = $request->quality === self::PREMIUM ? '>=' : '<';
+
+        return $this->leadRepository->allWhere([
+            'field' => 'electric_bill',
+            'operator' => $operator,
+            'threshold' => config('leads.threshold')
+        ])->load('address');
     }
 
     public function create(Request $request): Model

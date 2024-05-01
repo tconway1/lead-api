@@ -19,10 +19,10 @@ class ApiController extends Controller
         $this->apiService = $apiService;
     }
 
-    public function index(): Responsable
+    public function index(Request $request): Responsable
     {
         try {
-            $leads = $this->apiService->all();
+            $leads = $this->apiService->all($request);
         } catch (\Throwable $e) {
             return new ErrorResponse($e);
         }

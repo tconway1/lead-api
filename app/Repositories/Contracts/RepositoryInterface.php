@@ -11,6 +11,8 @@ interface RepositoryInterface
 
     public function all(): Collection;
 
+    public function allWhere(array $data): Collection;
+
     public function create(array $data): Model;
 
     public function update(array $data, Model $model): Model;
