@@ -21,7 +21,11 @@ class ApiController extends Controller
 
     public function index(): Responsable
     {
-        $leads = $this->apiService->all();
+        try {
+            $leads = $this->apiService->all();
+        } catch (\Throwable $e) {
+            return new ErrorResponse($e);
+        }
 
         return new CollectionResponse(LeadResource::collection($leads));
     }
@@ -58,4 +62,16 @@ class ApiController extends Controller
 
         return new StatusOnlyResponse();
     }
+
+    public function show(int $id): Responsable
+    {
+        try {
+            $lead = $this->apiService->find($id);
+        } catch (\Throwable $e) {
+            return new ErrorResponse($e);
+        }
+
+        return new CollectionResponse(LeadResource::collection([$lead]));
+    }
+
 }

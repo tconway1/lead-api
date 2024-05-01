@@ -57,11 +57,7 @@ class ApiService
 
     public function update(Request $request, int $id): Model
     {
-        $lead = $this->leadRepository->find($id);
-
-        if (empty($lead)) {
-            abort(404, self::LEAD_NOT_FOUND);
-        }
+        $lead = $this->find($id);
 
         $request->validate(self::UPDATE_RULES);
 
@@ -70,13 +66,20 @@ class ApiService
 
     public function delete(int $id): bool
     {
+        $lead = $this->find($id);
+
+        return $this->leadRepository->delete($lead);
+    }
+
+    public function find(int $id): Model
+    {
         $lead = $this->leadRepository->find($id);
 
         if (empty($lead)) {
             abort(404, self::LEAD_NOT_FOUND);
         }
 
-        return $this->leadRepository->delete($lead);
+        return $lead;
     }
 
     private function _cleanInput(array $input): array

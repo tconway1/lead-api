@@ -249,4 +249,46 @@ class ApiTest extends TestCase
             ],
         ]);
     }
+
+    public function test_can_retrieve_single_lead_via_api()
+    {
+        $lead = Lead::factory()
+            ->has(Address::factory())
+            ->afterCreating(function (Lead $lead) {
+                $lead->load('address');
+            })
+            ->create();
+
+        $this->assertDatabaseCount(Lead::class, 1)
+            ->assertDatabaseCount(Address::class, 1);
+
+        $response = $this->getJson(action([ApiController::class, 'show'], ['id' => $lead->id]));
+        $response->assertStatus(Http::OK->value)
+            ->assertJsonCount(1)
+            ->assertJsonStructure([
+                '*' => [
+                    'attributes' => [
+                        'address' => [
+                            'street',
+                            'city',
+                            'state',
+                            'zip_code',
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
+    public function test_show_lead_not_found_via_api()
+    {
+        $response = $this->getJson(action([ApiController::class, 'show'], ['id' => rand(10, 100)]));
+
+        $response->assertJsonStructure([
+            'errors' => [
+                'code',
+                'title',
+                'detail',
+            ],
+        ]);
+    }
 }
