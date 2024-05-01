@@ -30,9 +30,9 @@ class LeadRepository implements RepositoryInterface
         return $lead;
     }
 
-    public function delete(int $id): void
+    public function delete(Model $lead): bool
     {
-        // TODO: Implement delete() method.
+        return $lead->delete();
     }
 
     public function find(int $id): ?Model

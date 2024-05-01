@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\LeadResource;
 use App\Http\Responses\CollectionResponse;
 use App\Http\Responses\ErrorResponse;
+use App\Http\Responses\StatusOnlyResponse;
 use App\Services\ApiService;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
@@ -45,5 +46,16 @@ class ApiController extends Controller
         }
 
         return new CollectionResponse(LeadResource::collection([$lead]));
+    }
+
+    public function delete(int $id): Responsable
+    {
+        try {
+            $lead = $this->apiService->delete($id);
+        } catch (\Throwable $e) {
+            return new ErrorResponse($e);
+        }
+
+        return new StatusOnlyResponse();
     }
 }

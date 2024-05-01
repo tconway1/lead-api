@@ -90,7 +90,8 @@ class ApiTest extends TestCase
             'zip_code' => '12345',
         ]);
 
-        $response->assertJsonCount(1)
+        $response->assertStatus(Http::OK->value)
+            ->assertJsonCount(1)
             ->assertJsonStructure([
                 '*' => [
                     'attributes' => [
@@ -151,7 +152,8 @@ class ApiTest extends TestCase
             'phone' => 1231231234,
         ]);
 
-        $response->assertJsonCount(1)
+        $response->assertStatus(Http::OK->value)
+            ->assertJsonCount(1)
             ->assertJsonStructure([
                 '*' => [
                     'attributes' => [
@@ -199,6 +201,45 @@ class ApiTest extends TestCase
         $this->assertDatabaseHas(Lead::class, [
             'phone' => null,
         ]);
+
+        $response->assertJsonStructure([
+            'errors' => [
+                'code',
+                'title',
+                'detail',
+            ],
+        ]);
+    }
+
+    public function test_can_delete_lead_via_api()
+    {
+        $lead = Lead::factory()
+            ->has(Address::factory())
+            ->create();
+
+        $response = $this->deleteJson(action([ApiController::class, 'delete'], ['id' => $lead->id]));
+
+        $lead->refresh();
+        $address = $lead->address()->withTrashed()->first();
+
+        $this->assertDatabaseHas(Lead::class, [
+            'id' => $lead->id,
+            'firstname' => null,
+            'email' => null
+        ])->assertSoftDeleted($lead)
+            ->assertDatabaseHas(Address::class, [
+                'id' => $address->id,
+                'street' => null,
+                'city' => null,
+            ])
+            ->assertSoftDeleted($lead->address);
+
+        $response->assertStatus(Http::OK->value);
+    }
+
+    public function test_delete_lead_not_found_via_api()
+    {
+        $response = $this->deleteJson(action([ApiController::class, 'delete'], ['id' => rand(10, 100)]));
 
         $response->assertJsonStructure([
             'errors' => [

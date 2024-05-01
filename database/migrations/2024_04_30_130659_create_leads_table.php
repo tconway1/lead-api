@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('leads', function (Blueprint $table) {
             $table->id();
-            $table->string('firstname', 255);
-            $table->string('lastname', 255);
-            $table->string('email');
+            $table->string('firstname', 255)->nullable();
+            $table->string('lastname', 255)->nullable();
+            $table->string('email')->nullable();
             $table->unsignedBigInteger('phone')->nullable();
-            $table->integer('electric_bill');
+            $table->integer('electric_bill')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

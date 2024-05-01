@@ -15,7 +15,7 @@ interface RepositoryInterface
 
     public function update(array $data, Model $model): Model;
 
-    public function delete(int $id): void;
+    public function delete(Model $model): bool;
 
     public function find (int $id): ?Model;
 }

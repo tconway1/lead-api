@@ -20,3 +20,5 @@ Route::get('/leads', [ApiController::class, 'index']);
 Route::post('/leads', [ApiController::class, 'create']);
 
 Route::patch('/leads/{id}', [ApiController::class, 'update']);
+
+Route::delete('/leads/{id}', [ApiController::class, 'delete']);

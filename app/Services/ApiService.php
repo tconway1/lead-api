@@ -33,6 +33,8 @@ class ApiService
         'zip_code',
     ];
 
+    const LEAD_NOT_FOUND = 'The associated resource could not be found.';
+
     public function __construct(RepositoryInterface $leadRepository)
     {
         $this->leadRepository = $leadRepository;
@@ -58,12 +60,23 @@ class ApiService
         $lead = $this->leadRepository->find($id);
 
         if (empty($lead)) {
-            abort(404, 'The associated resource could not be found.');
+            abort(404, self::LEAD_NOT_FOUND);
         }
 
         $request->validate(self::UPDATE_RULES);
 
         return $this->leadRepository->update($request->only('phone'), $lead);
+    }
+
+    public function delete(int $id): bool
+    {
+        $lead = $this->leadRepository->find($id);
+
+        if (empty($lead)) {
+            abort(404, self::LEAD_NOT_FOUND);
+        }
+
+        return $this->leadRepository->delete($lead);
     }
 
     private function _cleanInput(array $input): array
